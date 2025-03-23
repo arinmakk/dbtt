@@ -19,10 +19,10 @@ export default function CarWorkshopChatbot() {
     }
   ]);
   const [input, setInput] = useState('');
-  const messagesEndRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
   // Auto-scroll to the most recent message
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
