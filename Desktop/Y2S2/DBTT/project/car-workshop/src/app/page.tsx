@@ -19,10 +19,10 @@ export default function CarWorkshopChatbot() {
     }
   ]);
   const [input, setInput] = useState('');
+  const messagesEndRef = useRef(null);
   const [loading, setLoading] = useState(false);
 
   // Auto-scroll to the most recent message
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -46,50 +46,36 @@ export default function CarWorkshopChatbot() {
     
     try {
       // Call to OpenAI API
-      const response = await fetch('/api', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           messages: [...messages, userMessage],
-          systemPrompt: `
-            You are **CarCare**, a friendly AI assistant for a car workshop in Singapore. You specialize in car maintenance, diagnostics, and service recommendations.
-
-            🎯 Your Goals:
-            - Help users understand car issues and service needs
-            - Suggest relevant services, timelines, and prices
-            - Educate first-time car owners using simple language
-
-            🗣️ Tone & Style:
-            - Clear, friendly, non-technical
-            - Speak like a helpful mechanic who explains things in plain English
-            - Be empathetic, especially if the user sounds worried
-
-            🧰 Your Knowledge Includes:
-            - Maintenance schedules and common car problems
-            - Service prices in SGD (Singapore Dollars)
-            - Typical conditions for a Toyota Corolla 2020
-
-            📝 Car status:
-            - Brake pads: 75% worn, due in 2 months or 1,500 km
-            - Oil: Good condition, change due in 2 months
-            - Tires: Good condition, rotation due in 6 months
-            - Battery: Good condition, check due in 12 months
-
-            💵 Service Pricing (SGD):
-            - Brake pad replacement: $150–$250
-            - Oil change: $50–$200
-            - Tire rotation: $60–$100
-            - New tires: $400+
-            - Battery replacement: $120–$300
-            - General diagnostic: $50–$200
-
-            🧠 Special Instructions:
-            - Use bullet points for breakdowns (when helpful)
-            - Always mention the **recommended timeframe or distance** for action
-            - If a user asks something vague, gently ask for more info
-            - For cost ranges, explain what affects the price (e.g., car type, brand of parts)`
+          systemPrompt: `You are an AI assistant for a car workshop called CarCare. You specialize in providing information about car maintenance, services, and recommendations in a friendly, jargon-free manner.
+          
+          When answering questions:
+          - Use simple, easy-to-understand language
+          - Be especially helpful to first-time car owners
+          - Explain terms that might be unfamiliar
+          - Focus on safety and reliability
+          - Provide cost estimates where appropriate (using SGD)
+          - Recommend maintenance schedules based on typical driving patterns
+          
+          You have access to information about common car issues, maintenance schedules, and service prices. The Toyota Corolla 2020 currently shows:
+          - Brake pads: 75% worn, due for replacement in 2 months or 1,500 km
+          - Oil: Good condition, change due in 2 months
+          - Tires: Good condition, rotation due in 6 months
+          - Battery: Good condition, check due in 12 months
+          
+          Service pricing:
+          - Brake pad replacement: SGD 150-250
+          - Oil change: SGD 50-200
+          - Tire rotation: SGD 60-100
+          - New tires: SGD 400+
+          - Battery replacement: SGD 120-300
+          - General diagnostic: SGD 50-200`
         }),
       });
       
@@ -118,13 +104,13 @@ export default function CarWorkshopChatbot() {
           {/* Place your chatbot component here */}
                   <div className=" bg-gray-50">
               <Card className="max-w-xl mx-auto shadow-lg">
-                <CardHeader className="bg-black text-white rounded-t-lg py-4">
+                <CardHeader className="bg-blue-600 text-white rounded-t-lg">
                   <CardTitle className="text-xl flex items-center gap-2">
                     <Wrench className="h-6 w-6" />
-                    CarCare Expert
+                    CarCare AI Assistant
                   </CardTitle>
                   <CardDescription className="text-blue-100">
-                    Ask me anything related to your car.
+                    Your personal car maintenance expert
                   </CardDescription>
                 </CardHeader>
                 
@@ -172,12 +158,7 @@ export default function CarWorkshopChatbot() {
                         value={input} 
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Ask about your car..." 
-                        onKeyDown={async (e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault(); // 🔒 prevent form submission/refresh
-                            await handleSendMessage(); // ✅ handle the async call properly
-                          }
-                        }}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                         className="flex-1"
                       />
                       <Button onClick={handleSendMessage}>
@@ -209,6 +190,7 @@ export default function CarWorkshopChatbot() {
                 </CardContent>
               </Card>
             </div>
+          <CarWorkshopChatbot />
         </div>
       </div>
     </div>
